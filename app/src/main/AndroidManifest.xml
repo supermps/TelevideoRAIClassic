@@ -1,23 +1,23 @@
 
-&lt;manifest xmlns:android="http://schemas.android.com/apk/res/android"&gt;
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
-    &lt;uses-permission android:name="android.permission.INTERNET" /&gt;
+    <uses-permission android:name="android.permission.INTERNET" />
 
-    &lt;application
+    <application
         android:allowBackup="true"
         android:label="Televideo RAI Classic"
-        android:theme="@android:style/Theme.Material.Light.NoActionBar"&gt;
+        android:theme="@android:style/Theme.Material.Light.NoActionBar">
 
-        &lt;activity
+        <activity
             android:name=".MainActivity"
-            android:exported="true"&gt;
+            android:exported="true">
 
-            &lt;intent-filter&gt;
-                &lt;action android:name="android.intent.action.MAIN" /&gt;
-                &lt;category android:name="android.intent.category.LAUNCHER" /&gt;
-            &lt;/intent-filter&gt;
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
 
-        &lt;/activity&gt;
-    &lt;/application&gt;
+        </activity>
+    </application>
 
-&lt;/manifest&gt;
+</manifest>
