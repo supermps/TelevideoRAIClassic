@@ -22,8 +22,10 @@ class MainActivity : Activity() {
     private lateinit var pageInput: EditText
     private lateinit var progress: ProgressBar
 
-    private fun pageUrl(page: String): String =
-        "https://origintelevideo.rai.it/televideo/pub/solotesto.jsp?pagina=$page"
+    private var currentPage = 100
+
+    private fun pageUrl(page: Int): String =
+        "https://www.televideo.rai.it/televideo/pub/tt4web/Nazionale/16_9_page-$page.png"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,24 +48,21 @@ class MainActivity : Activity() {
         val controls = LinearLayout(this).apply {
             orientation = LinearLayout.HORIZONTAL
             gravity = Gravity.CENTER_VERTICAL
-            setPadding(6, 6, 6, 6)
+            setPadding(5, 5, 5, 5)
             setBackgroundColor(0xFF202020.toInt())
         }
 
         pageInput = EditText(this).apply {
             hint = "Pagina"
             setText("100")
-            backgroundTintList = android.content.res.ColorStateList.valueOf(
-    0xFFFFFF00.toInt()
-)
-setBackgroundColor(0xFF404040.toInt())
-setPadding(12, 0, 12, 0)
             textSize = 18f
             setSingleLine(true)
             inputType = android.text.InputType.TYPE_CLASS_NUMBER
             imeOptions = EditorInfo.IME_ACTION_GO
             setTextColor(0xFFFFFFFF.toInt())
             setHintTextColor(0xFFBBBBBB.toInt())
+            setBackgroundColor(0xFF404040.toInt())
+            setPadding(10, 0, 10, 0)
         }
 
         controls.addView(
@@ -78,10 +77,53 @@ setPadding(12, 0, 12, 0)
 
         controls.addView(Button(this).apply {
             text = "AGGIORNA"
-            setOnClickListener { webView.reload() }
+            setOnClickListener { loadPage(currentPage) }
         })
 
         root.addView(controls)
+
+        val navigation = LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = Gravity.CENTER
+            setPadding(4, 2, 4, 5)
+            setBackgroundColor(0xFF202020.toInt())
+        }
+
+        navigation.addView(Button(this).apply {
+            text = "INDIETRO DI UNA PAGINA"
+            textSize = 11f
+            isAllCaps = false
+            setOnClickListener {
+                if (currentPage > 100) {
+                    loadPage(currentPage - 1)
+                } else {
+                    Toast.makeText(
+                        this@MainActivity,
+                        "Pagina minima: 100",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+        }, LinearLayout.LayoutParams(0, 52, 1f))
+
+        navigation.addView(Button(this).apply {
+            text = "AVANTI DI UNA PAGINA"
+            textSize = 11f
+            isAllCaps = false
+            setOnClickListener {
+                if (currentPage < 899) {
+                    loadPage(currentPage + 1)
+                } else {
+                    Toast.makeText(
+                        this@MainActivity,
+                        "Pagina massima: 899",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+        }, LinearLayout.LayoutParams(0, 52, 1f))
+
+        root.addView(navigation)
 
         progress = ProgressBar(
             this,
@@ -101,7 +143,7 @@ setPadding(12, 0, 12, 0)
         )
 
         webView = WebView(this).apply {
-            settings.javaScriptEnabled = true
+            settings.javaScriptEnabled = false
             settings.domStorageEnabled = true
             settings.builtInZoomControls = true
             settings.displayZoomControls = false
@@ -140,22 +182,28 @@ setPadding(12, 0, 12, 0)
         }
 
         setContentView(root)
-        webView.loadUrl(pageUrl("100"))
+        loadPage(100)
+    }
+
+    private fun loadPage(page: Int) {
+        currentPage = page
+        pageInput.setText(page.toString())
+        webView.loadUrl(pageUrl(page))
     }
 
     private fun openTypedPage() {
-        val page = pageInput.text.toString().trim()
+        val page = pageInput.text.toString().trim().toIntOrNull()
 
-        if (page.isEmpty() || page.length !in 1..3) {
+        if (page == null || page !in 100..899) {
             Toast.makeText(
                 this,
-                "Inserisci un numero di pagina valido",
+                "Inserisci una pagina da 100 a 899",
                 Toast.LENGTH_SHORT
             ).show()
             return
         }
 
-        webView.loadUrl(pageUrl(page))
+        loadPage(page)
     }
 
     @Deprecated("Deprecated in Android API")
