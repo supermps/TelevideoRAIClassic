@@ -54,7 +54,7 @@ class MainActivity : Activity() {
             hint = "Pagina"
             setText("100")
             textSize = 18f
-            singleLine = true
+            setSingleLine(true)
             inputType = android.text.InputType.TYPE_CLASS_NUMBER
             imeOptions = EditorInfo.IME_ACTION_GO
             setTextColor(0xFFFFFFFF.toInt())
@@ -108,8 +108,8 @@ class MainActivity : Activity() {
                     view: WebView?,
                     newProgress: Int
                 ) {
-                    progress.progress = newProgress
-                    progress.visibility =
+                    this@MainActivity.progress.progress = newProgress
+                    this@MainActivity.progress.visibility =
                         if (newProgress >= 100) View.GONE
                         else View.VISIBLE
                 }
