@@ -53,6 +53,11 @@ class MainActivity : Activity() {
         pageInput = EditText(this).apply {
             hint = "Pagina"
             setText("100")
+            backgroundTintList = android.content.res.ColorStateList.valueOf(
+    0xFFFFFF00.toInt()
+)
+setBackgroundColor(0xFF404040.toInt())
+setPadding(12, 0, 12, 0)
             textSize = 18f
             setSingleLine(true)
             inputType = android.text.InputType.TYPE_CLASS_NUMBER
