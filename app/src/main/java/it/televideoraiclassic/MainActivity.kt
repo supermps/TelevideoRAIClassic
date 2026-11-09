@@ -175,28 +175,54 @@ root.addView(navigation)
                 ) {
                     super.onPageFinished(view, url)
 
-                    val css = """
-                        html, body {
-                            background-color: #000000 !important;
-                            color: #FFFFFF !important;
-                        }
-                        body {
-                            color: #FFFFFF !important;
-                        }
-                        a, a:visited {
-                            color: #FFFF00 !important;
-                        }
-                    """.trimIndent()
+                    
+val css = """
+    html, body {
+        background-color: #000000 !important;
+        color: #FFFFFF !important;
+    }
+    body {
+        color: #FFFFFF !important;
+    }
+    a, a:visited {
+        color: #FFFF00 !important;
+    }
+""".trimIndent()
 
-                    val js = """
-                        (function() {
-                            var style = document.createElement('style');
-                            style.innerHTML = ${JSONObject.quote(css)};
-                            document.head.appendChild(style);
-                        })();
-                    """.trimIndent()
+val js = """
+    (function() {
+        var style = document.createElement('style');
+        style.innerHTML = ${JSONObject.quote(css)};
+        document.head.appendChild(style);
 
-                    view?.evaluateJavascript(js, null)
+        // Individua la barra delle categorie sotto il Televideo
+        var elements = Array.from(document.body.querySelectorAll('*'));
+
+        var nav = elements.find(function(el) {
+            var t = (el.innerText || '')
+                .replace(/\s+/g, ' ').trim();
+
+            return t.length < 180 &&
+                ['Prima', "Ultim'ora", 'Politica',
+                 'Economia', "Dall'Italia",
+                 'Dal Mondo', 'Culture']
+                .every(function(word) {
+                    return t.includes(word);
+                });
+        });
+
+        // Elimina la barra delle categorie e tutto ciò che segue
+        if (nav) {
+            var range = document.createRange();
+            range.setStartBefore(nav);
+            range.setEndAfter(document.body.lastChild);
+            range.deleteContents();
+        }
+    })();
+""".trimIndent()
+
+view?.evaluateJavascript(js, null)
+
                 }
             }
 
