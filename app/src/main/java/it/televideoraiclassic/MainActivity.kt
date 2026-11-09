@@ -151,23 +151,34 @@ root.addView(
         loadPage(100)
     }
 
-    
 private fun loadPage(page: Int) {
     currentPage = page
     pageInput.setText(page.toString())
 
-    webView.settings.apply {
-        javaScriptEnabled = false
-        domStorageEnabled = false
-        useWideViewPort = true
-        loadWithOverviewMode = true
-        builtInZoomControls = true
-        displayZoomControls = false
-    }
+    televideoImage.setImageDrawable(null)
 
-    webView.setBackgroundColor(android.graphics.Color.BLACK)
+    Thread {
+        try {
+            val url = java.net.URL(pageUrl(page))
+            val connection = url.openConnection() as java.net.HttpURLConnection
+            connection.connectTimeout = 10000
+            connection.readTimeout = 10000
+            connection.connect()
 
-    webView.loadUrl(pageUrl(page))
+            val bitmap = android.graphics.BitmapFactory
+                .decodeStream(connection.inputStream)
+
+            connection.disconnect()
+
+            runOnUiThread {
+                if (bitmap != null) {
+                    televideoImage.setImageBitmap(bitmap)
+                }
+            }
+        } catch (e: Exception) {
+            android.util.Log.e("TELEVIDEO", "Errore caricamento pagina", e)
+        }
+    }.start()
 }
 
 
