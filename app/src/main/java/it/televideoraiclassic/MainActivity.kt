@@ -157,9 +157,16 @@ root.addView(navigation)
 
             settings.javaScriptEnabled = true
             settings.domStorageEnabled = true
+
             settings.builtInZoomControls = true
             settings.displayZoomControls = false
-            settings.textZoom = 80
+
+            // Adatta tutta la pagina alla larghezza dello schermo
+            settings.useWideViewPort = true
+            settings.loadWithOverviewMode = true
+
+            // Dimensione originale dei caratteri
+            settings.textZoom = 100
 
             webViewClient = object : WebViewClient() {
                 override fun onPageFinished(
