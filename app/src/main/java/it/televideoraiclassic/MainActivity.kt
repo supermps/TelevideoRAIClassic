@@ -17,6 +17,7 @@ import android.widget.Toast
 class MainActivity : Activity() {
 
     private lateinit var webView: WebView
+    private lateinit var televideoImage: ImageView
     private lateinit var pageInput: EditText
 
     private var currentPage = 100
