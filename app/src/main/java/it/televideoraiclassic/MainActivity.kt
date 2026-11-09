@@ -159,6 +159,7 @@ root.addView(navigation)
             settings.domStorageEnabled = true
             settings.builtInZoomControls = true
             settings.displayZoomControls = false
+            settings.textZoom = 80
 
             webViewClient = object : WebViewClient() {
                 override fun onPageFinished(
