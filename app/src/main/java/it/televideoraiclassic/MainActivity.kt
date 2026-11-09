@@ -15,6 +15,7 @@ import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
+import org.json.JSONObject
 
 class MainActivity : Activity() {
 
@@ -25,7 +26,7 @@ class MainActivity : Activity() {
     private var currentPage = 100
 
     private fun pageUrl(page: Int): String =
-        "https://www.televideo.rai.it/televideo/pub/tt4web/Nazionale/16_9_page-$page.png"
+        "https://origintelevideo.rai.it/televideo/pub/solotesto.jsp?pagina=$page"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -77,6 +78,7 @@ class MainActivity : Activity() {
 
         controls.addView(Button(this).apply {
             text = "AGGIORNA"
+            setTextSize(11f)
             setOnClickListener { loadPage(currentPage) }
         })
 
@@ -91,7 +93,7 @@ class MainActivity : Activity() {
 
         navigation.addView(Button(this).apply {
             text = "INDIETRO DI UNA PAGINA"
-            textSize = 11f
+            textSize = 10f
             isAllCaps = false
             setOnClickListener {
                 if (currentPage > 100) {
@@ -104,11 +106,11 @@ class MainActivity : Activity() {
                     ).show()
                 }
             }
-        }, LinearLayout.LayoutParams(0, 52, 1f))
+        }, LinearLayout.LayoutParams(0, 48, 1f))
 
         navigation.addView(Button(this).apply {
             text = "AVANTI DI UNA PAGINA"
-            textSize = 11f
+            textSize = 10f
             isAllCaps = false
             setOnClickListener {
                 if (currentPage < 899) {
@@ -121,7 +123,7 @@ class MainActivity : Activity() {
                     ).show()
                 }
             }
-        }, LinearLayout.LayoutParams(0, 52, 1f))
+        }, LinearLayout.LayoutParams(0, 48, 1f))
 
         root.addView(navigation)
 
@@ -143,12 +145,44 @@ class MainActivity : Activity() {
         )
 
         webView = WebView(this).apply {
-            settings.javaScriptEnabled = false
+            setBackgroundColor(0xFF000000.toInt())
+
+            settings.javaScriptEnabled = true
             settings.domStorageEnabled = true
             settings.builtInZoomControls = true
             settings.displayZoomControls = false
 
-            webViewClient = WebViewClient()
+            webViewClient = object : WebViewClient() {
+                override fun onPageFinished(
+                    view: WebView?,
+                    url: String?
+                ) {
+                    super.onPageFinished(view, url)
+
+                    val css = """
+                        html, body {
+                            background-color: #000000 !important;
+                            color: #FFFFFF !important;
+                        }
+                        body {
+                            color: #FFFFFF !important;
+                        }
+                        a, a:visited {
+                            color: #FFFF00 !important;
+                        }
+                    """.trimIndent()
+
+                    val js = """
+                        (function() {
+                            var style = document.createElement('style');
+                            style.innerHTML = ${JSONObject.quote(css)};
+                            document.head.appendChild(style);
+                        })();
+                    """.trimIndent()
+
+                    view?.evaluateJavascript(js, null)
+                }
+            }
 
             webChromeClient = object : WebChromeClient() {
                 override fun onProgressChanged(
