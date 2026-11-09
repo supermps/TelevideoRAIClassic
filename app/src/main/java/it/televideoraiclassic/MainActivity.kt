@@ -122,24 +122,21 @@ class MainActivity : Activity() {
 
         root.addView(navigation)
 
-        webView = WebView(this).apply {
-            setBackgroundColor(Color.BLACK)
 
-            settings.javaScriptEnabled = false
-            settings.domStorageEnabled = false
-            settings.builtInZoomControls = true
-            settings.displayZoomControls = false
-        }
+televideoImage = ImageView(this).apply {
+    setBackgroundColor(Color.BLACK)
+    scaleType = ImageView.ScaleType.FIT_CENTER
+    adjustViewBounds = true
+}
 
-        root.addView(
-            webView,
-            LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                0,
-                1f
-            )
-        )
-
+root.addView(
+    televideoImage,
+    LinearLayout.LayoutParams(
+        LinearLayout.LayoutParams.MATCH_PARENT,
+        0,
+        1f
+    )
+)
         pageInput.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_GO) {
                 openTypedPage()
