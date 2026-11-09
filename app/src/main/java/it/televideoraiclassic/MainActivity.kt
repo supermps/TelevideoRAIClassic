@@ -3,47 +3,44 @@ package it.televideoraiclassic
 
 import android.app.Activity
 import android.os.Bundle
+import android.graphics.Color
 import android.view.Gravity
 import android.view.View
 import android.view.inputmethod.EditorInfo
-import android.webkit.WebChromeClient
 import android.webkit.WebView
-import android.webkit.WebViewClient
 import android.widget.Button
 import android.widget.EditText
 import android.widget.LinearLayout
-import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
-import org.json.JSONObject
 
 class MainActivity : Activity() {
 
     private lateinit var webView: WebView
     private lateinit var pageInput: EditText
-    private lateinit var progress: ProgressBar
 
     private var currentPage = 100
 
     private fun pageUrl(page: Int): String =
-        "https://origintelevideo.rai.it/televideo/pub/solotesto.jsp?pagina=$page"
+        "https://www.televideo.rai.it/televideo/pub/tt4web/Nazionale/16_9_page-$page.png"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         val root = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
-            setBackgroundColor(0xFF000000.toInt())
+            setBackgroundColor(Color.BLACK)
         }
 
         val header = TextView(this).apply {
             text = "TELEVIDEO RAI"
             textSize = 22f
             gravity = Gravity.CENTER
-            setTextColor(0xFF000000.toInt())
-            setBackgroundColor(0xFFFFFF00.toInt())
+            setTextColor(Color.BLACK)
+            setBackgroundColor(Color.YELLOW)
             setPadding(8, 12, 8, 12)
         }
+
         root.addView(header)
 
         val controls = LinearLayout(this).apply {
@@ -60,7 +57,7 @@ class MainActivity : Activity() {
             setSingleLine(true)
             inputType = android.text.InputType.TYPE_CLASS_NUMBER
             imeOptions = EditorInfo.IME_ACTION_GO
-            setTextColor(0xFFFFFFFF.toInt())
+            setTextColor(Color.WHITE)
             setHintTextColor(0xFFBBBBBB.toInt())
             setBackgroundColor(0xFF404040.toInt())
             setPadding(10, 0, 10, 0)
@@ -77,172 +74,59 @@ class MainActivity : Activity() {
         })
 
         controls.addView(Button(this).apply {
-    text = "AGGIORNA"
-    setTextSize(11f)
-    setOnClickListener {
-        val page = pageInput.text.toString().trim().toIntOrNull()
-        if (page != null && page in 100..899) {
-            loadPage(page)
-        } else {
-            loadPage(currentPage)
-        }
-    }
-})
+            text = "AGGIORNA"
+            textSize = 11f
+            setOnClickListener { loadPage(currentPage) }
+        })
 
         root.addView(controls)
 
-        
-val navigation = LinearLayout(this).apply {
-    orientation = LinearLayout.HORIZONTAL
-    gravity = Gravity.CENTER
-    setPadding(4, 2, 4, 5)
-    setBackgroundColor(0xFF202020.toInt())
-}
-
-val arrowWidth =
-    (64 * resources.displayMetrics.density).toInt()
-
-val arrowHeight =
-    (48 * resources.displayMetrics.density).toInt()
-
-navigation.addView(Button(this).apply {
-    text = "<"
-    textSize = 24f
-    isAllCaps = false
-    setOnClickListener {
-        if (currentPage > 100) {
-            loadPage(currentPage - 1)
-        } else {
-            Toast.makeText(
-                this@MainActivity,
-                "Pagina minima: 100",
-                Toast.LENGTH_SHORT
-            ).show()
-        }
-    }
-}, LinearLayout.LayoutParams(arrowWidth, arrowHeight))
-
-navigation.addView(Button(this).apply {
-    text = ">"
-    textSize = 24f
-    isAllCaps = false
-    setOnClickListener {
-        if (currentPage < 899) {
-            loadPage(currentPage + 1)
-        } else {
-            Toast.makeText(
-                this@MainActivity,
-                "Pagina massima: 899",
-                Toast.LENGTH_SHORT
-            ).show()
-        }
-    }
-}, LinearLayout.LayoutParams(arrowWidth, arrowHeight))
-
-root.addView(navigation)
-
-
-        progress = ProgressBar(
-            this,
-            null,
-            android.R.attr.progressBarStyleHorizontal
-        ).apply {
-            max = 100
-            visibility = View.GONE
+        val navigation = LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = Gravity.CENTER
+            setPadding(4, 2, 4, 5)
+            setBackgroundColor(0xFF202020.toInt())
         }
 
-        root.addView(
-            progress,
-            LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                4
-            )
-        )
+        val arrowWidth =
+            (64 * resources.displayMetrics.density).toInt()
+
+        val arrowHeight =
+            (48 * resources.displayMetrics.density).toInt()
+
+        navigation.addView(Button(this).apply {
+            text = "<"
+            textSize = 24f
+            setOnClickListener {
+                if (currentPage > 100) {
+                    loadPage(currentPage - 1)
+                } else {
+                    showMessage("Pagina minima: 100")
+                }
+            }
+        }, LinearLayout.LayoutParams(arrowWidth, arrowHeight))
+
+        navigation.addView(Button(this).apply {
+            text = ">"
+            textSize = 24f
+            setOnClickListener {
+                if (currentPage < 899) {
+                    loadPage(currentPage + 1)
+                } else {
+                    showMessage("Pagina massima: 899")
+                }
+            }
+        }, LinearLayout.LayoutParams(arrowWidth, arrowHeight))
+
+        root.addView(navigation)
 
         webView = WebView(this).apply {
-            setBackgroundColor(0xFF000000.toInt())
+            setBackgroundColor(Color.BLACK)
 
-            settings.javaScriptEnabled = true
-            settings.domStorageEnabled = true
-
+            settings.javaScriptEnabled = false
+            settings.domStorageEnabled = false
             settings.builtInZoomControls = true
             settings.displayZoomControls = false
-
-            settings.useWideViewPort = true
-settings.loadWithOverviewMode = true
-
-// Ingrandisce il testo per sfruttare meglio lo schermo
-settings.textZoom = 125
-
-            webViewClient = object : WebViewClient() {
-                override fun onPageFinished(
-                    view: WebView?,
-                    url: String?
-                ) {
-                    super.onPageFinished(view, url)
-
-                    
-val css = """
-    html, body {
-        background-color: #000000 !important;
-        color: #FFFFFF !important;
-    }
-    body {
-        color: #FFFFFF !important;
-    }
-    a, a:visited {
-        color: #FFFF00 !important;
-    }
-""".trimIndent()
-
-val js = """
-    (function() {
-        var style = document.createElement('style');
-        style.innerHTML = ${JSONObject.quote(css)};
-        document.head.appendChild(style);
-
-        // Individua la barra delle categorie sotto il Televideo
-        var elements = Array.from(document.body.querySelectorAll('*'));
-
-        var nav = elements.find(function(el) {
-            var t = (el.innerText || '')
-                .replace(/\s+/g, ' ').trim();
-
-            return t.length < 180 &&
-                ['Prima', "Ultim'ora", 'Politica',
-                 'Economia', "Dall'Italia",
-                 'Dal Mondo', 'Culture']
-                .every(function(word) {
-                    return t.includes(word);
-                });
-        });
-
-        // Elimina la barra delle categorie e tutto ciò che segue
-        if (nav) {
-            var range = document.createRange();
-            range.setStartBefore(nav);
-            range.setEndAfter(document.body.lastChild);
-            range.deleteContents();
-        }
-    })();
-""".trimIndent()
-
-view?.evaluateJavascript(js, null)
-
-                }
-            }
-
-            webChromeClient = object : WebChromeClient() {
-                override fun onProgressChanged(
-                    view: WebView?,
-                    newProgress: Int
-                ) {
-                    this@MainActivity.progress.progress = newProgress
-                    this@MainActivity.progress.visibility =
-                        if (newProgress >= 100) View.GONE
-                        else View.VISIBLE
-                }
-            }
         }
 
         root.addView(
@@ -264,28 +148,77 @@ view?.evaluateJavascript(js, null)
         }
 
         setContentView(root)
+
         loadPage(100)
     }
 
     private fun loadPage(page: Int) {
         currentPage = page
         pageInput.setText(page.toString())
-        webView.loadUrl(pageUrl(page))
+
+        val imageUrl = pageUrl(page) +
+            "?refresh=" + System.currentTimeMillis()
+
+        val html = """
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <meta name="viewport"
+                    content="width=device-width,
+                    initial-scale=1.0,
+                    maximum-scale=1.0">
+                <style>
+                    html, body {
+                        margin: 0;
+                        padding: 0;
+                        width: 100%;
+                        height: 100%;
+                        background: black;
+                        overflow: hidden;
+                    }
+
+                    img {
+                        display: block;
+                        width: 100%;
+                        height: 100%;
+                        object-fit: contain;
+                    }
+                </style>
+            </head>
+            <body>
+                <img src="$imageUrl" alt="Pagina Televideo">
+            </body>
+            </html>
+        """.trimIndent()
+
+        webView.loadDataWithBaseURL(
+            "https://www.televideo.rai.it/",
+            html,
+            "text/html",
+            "UTF-8",
+            null
+        )
     }
 
     private fun openTypedPage() {
-        val page = pageInput.text.toString().trim().toIntOrNull()
+        val page = pageInput.text.toString()
+            .trim()
+            .toIntOrNull()
 
         if (page == null || page !in 100..899) {
-            Toast.makeText(
-                this,
-                "Inserisci una pagina da 100 a 899",
-                Toast.LENGTH_SHORT
-            ).show()
+            showMessage("Inserisci una pagina da 100 a 899")
             return
         }
 
         loadPage(page)
+    }
+
+    private fun showMessage(message: String) {
+        Toast.makeText(
+            this,
+            message,
+            Toast.LENGTH_SHORT
+        ).show()
     }
 
     @Deprecated("Deprecated in Android API")
