@@ -154,34 +154,58 @@ root.addView(
 private fun loadPage(page: Int) {
     currentPage = page
     pageInput.setText(page.toString())
-
     televideoImage.setImageDrawable(null)
 
     Thread {
+        var connection: java.net.HttpURLConnection? = null
+
         try {
             val url = java.net.URL(pageUrl(page))
-            val connection = url.openConnection() as java.net.HttpURLConnection
-            connection.connectTimeout = 10000
-            connection.readTimeout = 10000
-            connection.connect()
+            connection = url.openConnection() as java.net.HttpURLConnection
 
-            val bitmap = android.graphics.BitmapFactory
-                .decodeStream(connection.inputStream)
+            connection.connectTimeout = 15000
+            connection.readTimeout = 15000
+            connection.instanceFollowRedirects = true
+            connection.setRequestProperty(
+                "User-Agent",
+                "Mozilla/5.0 (Linux; Android 12) AppleWebKit/537.36 Chrome/120.0 Mobile Safari/537.36"
+            )
 
-            connection.disconnect()
+            val response = connection.responseCode
+
+            if (response != 200) {
+                throw Exception("Risposta server: HTTP $response")
+            }
+
+            val bitmap = connection.inputStream.use {
+                android.graphics.BitmapFactory.decodeStream(it)
+            }
+
+            if (bitmap == null) {
+                throw Exception("Impossibile decodificare l'immagine")
+            }
 
             runOnUiThread {
-                if (bitmap != null) {
-                    televideoImage.setImageBitmap(bitmap)
-                }
+                televideoImage.setImageBitmap(bitmap)
             }
+
         } catch (e: Exception) {
-            android.util.Log.e("TELEVIDEO", "Errore caricamento pagina", e)
+            android.util.Log.e("TELEVIDEO", "Errore caricamento", e)
+
+            runOnUiThread {
+                android.widget.Toast.makeText(
+                    this,
+                    "Errore Televideo: ${e.message}",
+                    android.widget.Toast.LENGTH_LONG
+                ).show()
+            }
+
+        } finally {
+            connection?.disconnect()
         }
     }.start()
 }
-
-
+    
     private fun openTypedPage() {
         val page = pageInput.text.toString()
             .trim()
