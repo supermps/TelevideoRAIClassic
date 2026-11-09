@@ -152,53 +152,25 @@ class MainActivity : Activity() {
         loadPage(100)
     }
 
-    private fun loadPage(page: Int) {
-        currentPage = page
-        pageInput.setText(page.toString())
+    
+private fun loadPage(page: Int) {
+    currentPage = page
+    pageInput.setText(page.toString())
 
-        val imageUrl = pageUrl(page) +
-            "?refresh=" + System.currentTimeMillis()
-
-        val html = """
-            <!DOCTYPE html>
-            <html>
-            <head>
-                <meta name="viewport"
-                    content="width=device-width,
-                    initial-scale=1.0,
-                    maximum-scale=1.0">
-                <style>
-                    html, body {
-                        margin: 0;
-                        padding: 0;
-                        width: 100%;
-                        height: 100%;
-                        background: black;
-                        overflow: hidden;
-                    }
-
-                    img {
-                        display: block;
-                        width: 100%;
-                        height: 100%;
-                        object-fit: contain;
-                    }
-                </style>
-            </head>
-            <body>
-                <img src="$imageUrl" alt="Pagina Televideo">
-            </body>
-            </html>
-        """.trimIndent()
-
-        webView.loadDataWithBaseURL(
-            "https://www.televideo.rai.it/",
-            html,
-            "text/html",
-            "UTF-8",
-            null
-        )
+    webView.settings.apply {
+        javaScriptEnabled = false
+        domStorageEnabled = false
+        useWideViewPort = true
+        loadWithOverviewMode = true
+        builtInZoomControls = true
+        displayZoomControls = false
     }
+
+    webView.setBackgroundColor(android.graphics.Color.BLACK)
+
+    webView.loadUrl(pageUrl(page))
+}
+
 
     private fun openTypedPage() {
         val page = pageInput.text.toString()
