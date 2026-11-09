@@ -84,48 +84,56 @@ class MainActivity : Activity() {
 
         root.addView(controls)
 
-        val navigation = LinearLayout(this).apply {
-            orientation = LinearLayout.HORIZONTAL
-            gravity = Gravity.CENTER
-            setPadding(4, 2, 4, 5)
-            setBackgroundColor(0xFF202020.toInt())
+        
+val navigation = LinearLayout(this).apply {
+    orientation = LinearLayout.HORIZONTAL
+    gravity = Gravity.CENTER
+    setPadding(4, 2, 4, 5)
+    setBackgroundColor(0xFF202020.toInt())
+}
+
+val arrowWidth =
+    (64 * resources.displayMetrics.density).toInt()
+
+val arrowHeight =
+    (48 * resources.displayMetrics.density).toInt()
+
+navigation.addView(Button(this).apply {
+    text = "<"
+    textSize = 24f
+    isAllCaps = false
+    setOnClickListener {
+        if (currentPage > 100) {
+            loadPage(currentPage - 1)
+        } else {
+            Toast.makeText(
+                this@MainActivity,
+                "Pagina minima: 100",
+                Toast.LENGTH_SHORT
+            ).show()
         }
+    }
+}, LinearLayout.LayoutParams(arrowWidth, arrowHeight))
 
-        navigation.addView(Button(this).apply {
-            text = "INDIETRO DI UNA PAGINA"
-            textSize = 10f
-            isAllCaps = false
-            setOnClickListener {
-                if (currentPage > 100) {
-                    loadPage(currentPage - 1)
-                } else {
-                    Toast.makeText(
-                        this@MainActivity,
-                        "Pagina minima: 100",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
-            }
-        }, LinearLayout.LayoutParams(0, 48, 1f))
+navigation.addView(Button(this).apply {
+    text = ">"
+    textSize = 24f
+    isAllCaps = false
+    setOnClickListener {
+        if (currentPage < 899) {
+            loadPage(currentPage + 1)
+        } else {
+            Toast.makeText(
+                this@MainActivity,
+                "Pagina massima: 899",
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+    }
+}, LinearLayout.LayoutParams(arrowWidth, arrowHeight))
 
-        navigation.addView(Button(this).apply {
-            text = "AVANTI DI UNA PAGINA"
-            textSize = 10f
-            isAllCaps = false
-            setOnClickListener {
-                if (currentPage < 899) {
-                    loadPage(currentPage + 1)
-                } else {
-                    Toast.makeText(
-                        this@MainActivity,
-                        "Pagina massima: 899",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
-            }
-        }, LinearLayout.LayoutParams(0, 48, 1f))
+root.addView(navigation)
 
-        root.addView(navigation)
 
         progress = ProgressBar(
             this,
