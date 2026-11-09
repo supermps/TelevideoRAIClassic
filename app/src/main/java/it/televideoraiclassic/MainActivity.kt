@@ -77,10 +77,17 @@ class MainActivity : Activity() {
         })
 
         controls.addView(Button(this).apply {
-            text = "AGGIORNA"
-            setTextSize(11f)
-            setOnClickListener { loadPage(currentPage) }
-        })
+    text = "AGGIORNA"
+    setTextSize(11f)
+    setOnClickListener {
+        val page = pageInput.text.toString().trim().toIntOrNull()
+        if (page != null && page in 100..899) {
+            loadPage(page)
+        } else {
+            loadPage(currentPage)
+        }
+    }
+})
 
         root.addView(controls)
 
@@ -161,12 +168,11 @@ root.addView(navigation)
             settings.builtInZoomControls = true
             settings.displayZoomControls = false
 
-            // Adatta tutta la pagina alla larghezza dello schermo
             settings.useWideViewPort = true
-            settings.loadWithOverviewMode = true
+settings.loadWithOverviewMode = true
 
-            // Dimensione originale dei caratteri
-            settings.textZoom = 100
+// Ingrandisce il testo per sfruttare meglio lo schermo
+settings.textZoom = 125
 
             webViewClient = object : WebViewClient() {
                 override fun onPageFinished(
