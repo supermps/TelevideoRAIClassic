@@ -173,6 +173,8 @@ private fun loadPage(page: Int) {
 
             val response = connection.responseCode
 
+            val contentType = connection.contentType
+
             if (response != 200) {
                 throw Exception("Risposta server: HTTP $response")
             }
@@ -182,8 +184,8 @@ private fun loadPage(page: Int) {
             }
 
             if (bitmap == null) {
-                throw Exception("Impossibile decodificare l'immagine")
-            }
+    throw Exception("HTTP $response - Tipo: $contentType")
+}
 
             runOnUiThread {
                 televideoImage.setImageBitmap(bitmap)
