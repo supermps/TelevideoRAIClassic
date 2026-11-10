@@ -173,6 +173,16 @@ private fun loadPage(page: Int) {
 
             val response = connection.responseCode
 
+            connection.setRequestProperty(
+    "Accept",
+    "image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8"
+)
+
+connection.setRequestProperty(
+    "Referer",
+    "https://www.televideo.rai.it/"
+)
+
             val contentType = connection.contentType
 
             if (response != 200) {
