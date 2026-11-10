@@ -156,24 +156,20 @@ private fun loadPage(page: Int) {
     pageInput.setText(page.toString())
     televideoImage.setImageDrawable(null)
 
-    Thread {
-        var connection: java.net.HttpURLConnection? = null
+    
+val url = java.net.URL(pageUrl(page))
+connection = url.openConnection() as java.net.HttpURLConnection
 
-        try {
-            val url = java.net.URL(pageUrl(page))
-            connection = url.openConnection() as java.net.HttpURLConnection
+connection.connectTimeout = 15000
+connection.readTimeout = 15000
+connection.instanceFollowRedirects = true
 
-            connection.connectTimeout = 15000
-            connection.readTimeout = 15000
-            connection.instanceFollowRedirects = true
-            connection.setRequestProperty(
-                "User-Agent",
-                "Mozilla/5.0 (Linux; Android 12) AppleWebKit/537.36 Chrome/120.0 Mobile Safari/537.36"
-            )
+connection.setRequestProperty(
+    "User-Agent",
+    "Mozilla/5.0 (Linux; Android 12) AppleWebKit/537.36 Chrome/120.0 Mobile Safari/537.36"
+)
 
-            val response = connection.responseCode
-
-            connection.setRequestProperty(
+connection.setRequestProperty(
     "Accept",
     "image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8"
 )
@@ -183,8 +179,9 @@ connection.setRequestProperty(
     "https://www.televideo.rai.it/"
 )
 
-            val contentType = connection.contentType
-
+val response = connection.responseCode
+val contentType = connection.contentType
+    
             if (response != 200) {
                 throw Exception("Risposta server: HTTP $response")
             }
